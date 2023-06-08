@@ -1,0 +1,124 @@
+.cell::selection {
+    background: none; /* WebKit/Blink Browsers */
+}
+.cell::-moz-selection {
+    background: none; /* Gecko Browsers */
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
+button {
+    display: inline-block;
+    outline: none;
+    cursor: pointer;
+    border: 1px solid #0f62fe;
+    text-align: left;
+    vertical-align: top;
+    padding: 15px;
+    background-color: #0353e9;
+    font-size: 14px;
+    letter-spacing: 0.16px;
+    min-height: 48px;
+    line-height: 1.29;
+    color: white;
+    font-weight: 400;
+}
+
+.button-gg {
+    float: right;
+    border: 1px solid orange;
+    background-color: rgb(178, 173, 163);
+    color: rgb(23, 23, 23);
+}
+
+.container,
+.ball-container {
+    display: flex;
+}
+
+.ball.selected {
+    border: 2px solid red;
+}
+
+.left-panel {
+    width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.right-panel {
+    flex: 1;
+    border-radius: 2px;
+    padding: 5px;
+    background-color: lightgray;
+    border: 1px solid grey;
+    margin-left: 20px;
+}
+
+#grid-info,
+#balls-info {
+    background-color: rgba(199, 191, 191, 0.102);
+    border-radius: 2px;
+    padding: 0 10px 10px 10px;
+    margin-bottom: 10px;
+    border: 1px solid grey;
+}
+
+.ball-container {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: rgb(204, 204, 204);
+    border: 1px solid grey;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.content-container {
+    margin-top: 5px;
+    border-radius: 2px;
+    background-color: white;
+    padding: 10px;
+    text-align: center;
+}
+
+.row {
+    display: flex;
+}
+
+.row:nth-child(even) {
+    margin-left: 20px;
+}
+
+.cell {
+    background-color: rgb(126, 184, 203);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    box-sizing: border-box;
+    position: relative;
+    margin: 2px;
+}
+
+.ball {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+}
+
+.ball input {
+    position: absolute;
+    bottom: -20px;
+    width: 40px;
+    text-align: center;
+}
+
+.ball img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    pointer-events: none;
+}

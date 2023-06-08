@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Ball Grids</title>
+        <link rel="stylesheet" href="./style.css" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="left-panel">
+                <div id="grid-info">
+                    <h2>Grid</h2>
+                    <select
+                        id="levelSelect"
+                        onchange="loadGridFromLocalStorage()"
+                    >
+                        <option value="">Select Level</option>
+                        <option value="level1">Level 1</option>
+                        <option value="level2">Level 2</option>
+                        <option value="level3">Level 3</option>
+                        <option value="level4">Level 4</option>
+                        <option value="level5">Level 5</option>
+                        <option value="level6">Level 6</option>
+                        <option value="level7">Level 7</option>
+                        <option value="level8">Level 8</option>
+                        <option value="level9">Level 9</option>
+                        <!-- Add more options for additional levels -->
+                    </select>
+                    <textarea
+                        id="inputArray"
+                        rows="10"
+                        cols="50"
+                        placeholder="Paste grid data here"
+                    ></textarea>
+                    <button onclick="saveGridToLocalStorage()">
+                        Save Grid
+                    </button>
+                    <button class="button-gg" onclick="generateFromJSON()">
+                        Generate Grid!
+                    </button>
+                </div>
+                <div id="balls-info">
+                    <h2>Balls</h2>
+                    <div id="balls"></div>
+                    <textarea
+                        id="ballsArray"
+                        rows="10"
+                        cols="50"
+                        placeholder="Paste array here"
+                        style="display: none"
+                    ></textarea>
+                </div>
+            </div>
+            <div class="right-panel" id="grid"></div>
+        </div>
+
+        <script>
+            // JSON configuration for the left-side elements
+            const config = [
+                {
+                    dataId: "r",
+                    imgSrc: "red_ball.png",
+                },
+                {
+                    dataId: "g",
+                    imgSrc: "green_ball.png",
+                },
+                {
+                    dataId: "b",
+                    imgSrc: "blue_ball.png",
+                },
+                {
+                    dataId: "p",
+                    imgSrc: "purple_ball.png",
+                },
+                {
+                    dataId: "o",
+                    imgSrc: "orange_ball.png",
+                },
+                {
+                    dataId: "y",
+                    imgSrc: "yellow_ball.png",
+                },
+                {
+                    dataId: "U",
+                    imgSrc: "immovable_ball.png",
+                },
+                {
+                    dataId: "V",
+                    imgSrc: "collectable1.png",
+                },
+                {
+                    dataId: "W",
+                    imgSrc: "collectable2.png",
+                },
+                {
+                    dataId: "X",
+                    imgSrc: "collectable3.png",
+                },
+                {
+                    dataId: "Z",
+                    imgSrc: "collectable4.png",
+                },
+            ];
+
+            // Generate left-side ball elements based on the config
+            function generateLeftSide(autoConfig) {
+                const leftSide = document.getElementById("balls");
+                leftSide.innerHTML = "";
+                let textarea;
+                if (autoConfig) {
+                    textarea = autoConfig;
+                    document.getElementById("ballsArray").value = autoConfig;
+                } else {
+                    textarea = document.getElementById("ballsArray").value;
+                }
+                try {
+                    // Parse the JSON string into a JavaScript object
+                    const config = JSON.parse(textarea);
+
+                    // Now you can work with the jsonObject as a JavaScript object
+                    config.forEach((item) => {
+                        const container = document.createElement("div");
+                        container.classList.add("ball-container");
+
+                        const imageContainer = document.createElement("div");
+                        imageContainer.classList.add("image-container");
+
+                        const ballDiv = document.createElement("div");
+                        ballDiv.id = item.id;
+                        ballDiv.setAttribute("data-id", item.dataId);
+                        ballDiv.classList.add("ball");
+
+                        const ballImg = document.createElement("img");
+                        ballImg.src = item.imgSrc;
+
+                        ballDiv.appendChild(ballImg);
+                        imageContainer.appendChild(ballDiv);
+
+                        const contentContainer = document.createElement("div");
+                        contentContainer.classList.add("content-container");
+                        contentContainer.textContent = item.dataId;
+                        container.appendChild(imageContainer);
+                        container.appendChild(contentContainer);
+
+                        leftSide.appendChild(container);
+                    });
+                } catch (error) {
+                    // Handle any potential errors during parsing
+                    console.error("Error parsing JSON:", error);
+                }
+            }
+
+            function generateGrid(containerId, numRows, numCols) {
+                const container = document.getElementById(containerId);
+
+                for (let i = 0; i < numRows; i++) {
+                    const row = document.createElement("div");
+                    row.classList.add("row");
+
+                    for (let j = 0; j < numCols; j++) {
+                        if (i % 2 === 0 || j < numCols - 1) {
+                            const cell = document.createElement("div");
+                            cell.classList.add("cell");
+                            row.appendChild(cell);
+                        }
+                    }
+
+                    container.appendChild(row);
+                }
+            }
+
+            function selectBall(e) {
+                const ball = e.currentTarget;
+
+                if (selectedBall) {
+                    selectedBall.classList.remove("selected");
+                }
+
+                if (selectedBall === ball) {
+                    selectedBall = null;
+                } else {
+                    selectedBall = ball;
+
+                    selectedBall.classList.add("selected");
+                }
+            }
+
+            function clickOnGridCell(e) {
+                const cell = e.target.closest(".cell");
+                cell.innerHTML = "";
+                if (selectedBall) {
+                    const ballDataId = selectedBall.getAttribute("data-id");
+                    const ballImgSrc = selectedBall.querySelector("img").src;
+
+                    cell.innerHTML = `
+                            <div class="ball" data-id="${ballDataId}">
+                                <img src="${ballImgSrc}" alt="Ball">
+                            </div>
+                        `;
+                }
+
+                generateArray();
+            }
+
+            function dragMove(e) {
+                if (selectedBall && e.buttons === 1) {
+                    const cell = e.target.closest(".cell");
+                    if (cell) {
+                        cell.innerHTML = "";
+                        const ballClone = selectedBall.cloneNode(true);
+                        ballClone.classList.remove("selected");
+
+                        cell.appendChild(ballClone);
+
+                        generateArray();
+                    }
+                }
+            }
+
+            function generateArray() {
+                const mainGridRows = Array.from(
+                    document.querySelectorAll("#grid .row")
+                );
+                const mainGridArray = mainGridRows.map((row) => {
+                    const cells = Array.from(row.querySelectorAll(".cell"));
+                    const codes = cells.map((cell) => {
+                        const dataId = cell.innerHTML
+                            ? cell
+                                  .querySelector(".ball")
+                                  .getAttribute("data-id")
+                            : null;
+                        return dataId && dataId !== "." ? dataId : " ";
+                    });
+                    return codes;
+                });
+                document.getElementById("inputArray").value =
+                    JSON.stringify(mainGridArray);
+            }
+
+            function importConfig() {
+                generateLeftSide();
+            }
+            function exportConfig() {
+                console.log("exporting");
+
+                const leftSideElements =
+                    document.querySelectorAll("#balls .ball");
+                const inspectedConfig = [];
+
+                leftSideElements.forEach((element) => {
+                    const id = element.id;
+                    const dataId = element.getAttribute("data-id");
+                    const imgSrc = element.querySelector("img").src;
+
+                    inspectedConfig.push({ id, dataId, imgSrc });
+                });
+
+                document.getElementById("ballsArray").value =
+                    JSON.stringify(inspectedConfig);
+            }
+            function generateFromJSON() {
+                const inputArray = document.getElementById("inputArray").value;
+                let array;
+
+                try {
+                    array = JSON.parse(inputArray);
+                } catch (error) {
+                    console.error("Invalid array format");
+                    return;
+                }
+
+                const rows = Array.from(document.querySelectorAll(".row"));
+
+                rows.forEach((row, rowIndex) => {
+                    const cells = Array.from(row.querySelectorAll(".cell"));
+
+                    cells.forEach((cell, colIndex) => {
+                        const value = array[rowIndex]
+                            ? array[rowIndex][colIndex]
+                            : " ";
+
+                        if (value !== " ") {
+                            const matchingBall = Array.from(
+                                document.querySelectorAll(".ball")
+                            ).find(
+                                (ball) => ball.getAttribute("data-id") === value
+                            );
+
+                            if (matchingBall) {
+                                const html = matchingBall.outerHTML;
+                                cell.innerHTML = html;
+                            } else {
+                                console.error(
+                                    `No matching ball found for value "${value}"`
+                                );
+                            }
+                        } else {
+                            cell.innerHTML = ""; // Clear the cell if the value is empty
+                        }
+                    });
+                });
+
+                console.log(array);
+            }
+
+            function saveGridToLocalStorage() {
+                const inputArray = document.getElementById("inputArray").value;
+                const levelSelect = document.getElementById("levelSelect");
+                const selectedLevel =
+                    levelSelect.options[levelSelect.selectedIndex].value;
+
+                if (selectedLevel !== "") {
+                    localStorage.setItem(selectedLevel, inputArray);
+                    alert("Grid saved to local storage!");
+                } else {
+                    alert("Please select a level before saving the grid!");
+                }
+            }
+
+            function loadGridFromLocalStorage() {
+                const levelSelect = document.getElementById("levelSelect");
+                const selectedLevel =
+                    levelSelect.options[levelSelect.selectedIndex].value;
+
+                if (selectedLevel) {
+                    const savedGrid = localStorage.getItem(selectedLevel);
+
+                    if (savedGrid) {
+                        document.getElementById("inputArray").value = savedGrid;
+                        generateFromJSON();
+                    } else {
+                        document.getElementById("inputArray").value = "[]";
+                        generateFromJSON(); // Update the grid to the default state
+                    }
+                } else {
+                    document.getElementById("inputArray").value = "[]";
+                    generateFromJSON(); // Update the grid to the default state
+                }
+            }
+
+            generateLeftSide(JSON.stringify(config));
+
+            // Call the generateGrid function to create the grid
+            generateGrid("grid", 17, 21);
+
+            const balls = document.querySelectorAll(".ball");
+
+            balls.forEach((ball, index) => {
+                ball.addEventListener("click", selectBall);
+            });
+
+            let selectedBall = null;
+
+            const grid = document.getElementById("grid");
+
+            grid.addEventListener("click", clickOnGridCell);
+            grid.addEventListener("mousemove", dragMove);
+        </script>
+    </body>
+</html>
