@@ -30,11 +30,16 @@
                         rows="10"
                         cols="50"
                         placeholder="Paste grid data here"
+                        disabled
                     ></textarea>
-                    <button onclick="saveGridToLocalStorage()">
+                    <button onclick="saveGridToLocalStorage()" disabled>
                         Save Grid
                     </button>
-                    <button class="button-gg" onclick="generateFromJSON()">
+                    <button
+                        class="button-gg"
+                        onclick="generateFromJSON()"
+                        disabled
+                    >
                         Generate Grid!
                     </button>
                 </div>
@@ -56,6 +61,10 @@
         <script>
             // JSON configuration for the left-side elements
             const config = [
+                {
+                    dataId: " ",
+                    imgSrc: "",
+                },
                 {
                     dataId: "r",
                     imgSrc: "red_ball.png",
@@ -130,10 +139,12 @@
                         ballDiv.setAttribute("data-id", item.dataId);
                         ballDiv.classList.add("ball");
 
-                        const ballImg = document.createElement("img");
-                        ballImg.src = item.imgSrc;
+                        if (item.imgSrc) {
+                            const ballImg = document.createElement("img");
+                            ballImg.src = item.imgSrc;
 
-                        ballDiv.appendChild(ballImg);
+                            ballDiv.appendChild(ballImg);
+                        }
                         imageContainer.appendChild(ballDiv);
 
                         const contentContainer = document.createElement("div");
@@ -192,11 +203,19 @@
                     const ballDataId = selectedBall.getAttribute("data-id");
                     const ballImgSrc = selectedBall.querySelector("img").src;
 
-                    cell.innerHTML = `
+                    if (ballImgSrc) {
+                        cell.innerHTML = `
                             <div class="ball" data-id="${ballDataId}">
                                 <img src="${ballImgSrc}" alt="Ball">
                             </div>
                         `;
+                    } else {
+                        cell.innerHTML = `
+                            <div class="ball" data-id="${ballDataId}">
+                                
+                            </div>
+                        `;
+                    }
                 }
 
                 generateArray();
