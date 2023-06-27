@@ -3,21 +3,20 @@
 Ability to generate levels for the Genie component - Bubble pop.
 <img width="1216" alt="Screenshot 2023-05-24 at 12 29 11" src="https://github.com/aerstudios/genie-bubble-pop-creator/assets/17544779/98ceacba-d08e-4c5d-8aae-ea09420d2fb4">
 
+
 ## Balls Config
 
 Below is how the balls get loaded into this file. If you wish to add your own ball images and code then update this default snippet.
 Placing the images in the same folder as the index.html file
-
 ```
 [{"dataId":"R","imgSrc":"red_ball.png"},{"dataId":"G","imgSrc":"green_ball.png"},{"dataId":"B","imgSrc":"blue_ball.png"},{"dataId":".","imgSrc":"white_ball.png"}]
 ```
-
-A ball has
-
--   dataId this is the output of the ball in the grid
--   imgSrc this is the destination of the file
+A ball has 
+ - dataId this is the output of the ball in the grid
+ - imgSrc this is the destination of the file
 
 <img width="491" alt="Screenshot 2023-05-23 at 17 21 39" src="https://github.com/aerstudios/genie-bubble-pop-creator/assets/17544779/ceecaa2c-80b7-4996-ae2b-200bb30e2337">
+
 
 ## Grid Config
 
